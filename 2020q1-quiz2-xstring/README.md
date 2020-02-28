@@ -6,8 +6,11 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 `$ gcc -o test_tok -std=gnu11 test_output_tok.c xs.c`
 
 ## Result
-Expected result
+
 `$ ./test_cow`
+
+Expected result
+
 ```
 after cpy from string to cow1 & cow2
 
@@ -79,6 +82,9 @@ reference count: 1
 ```
 
 `$ ./test_tok`
+
+Expected result
+
 ```
 #token
 HELLO W
