@@ -1,8 +1,9 @@
 # [2020q1 quiz2](https://hackmd.io/@colinyoyo26/xs)
-Use SSO (small string optimization) and CoW (copy on write) to optimize string
+Use SSO (small string optimization) and CoW (copy on write) to optimize string, click the link for detail.
 
 ## Compile
 `$ gcc -o test_cow -std=gnu11 test_output_cow.c xs.c`
+`$ gcc -o test_tok -std=gnu11 test_output_tok.c xs.c`
 
 ## Result
 Expected result
@@ -75,4 +76,20 @@ reference count: 1
 string: (((gggfoobarbarbarbarbarzzz)))
 &string: 0x1735450
 reference count: 1
+```
+
+`$ ./test_tok`
+```
+#token
+HELLO W
+
+#initial string
+HELLOW fooHELLOWbarHbarfooLbarLbarObarW
+
+foo
+bar
+barfoo
+bar
+bar
+bar
 ```
