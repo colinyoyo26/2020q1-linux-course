@@ -65,7 +65,10 @@ xs *xs_grow(xs *x, size_t len)
 static inline xs *xs_newempty(xs *x)
 {
     *x = xs_literal_empty();
-    return x;
+    return x;uint8_t mask[32] = {0};
+
+#define check_bit(byte) (mask[(uint8_t) byte / 8] & 1 << (uint8_t) byte % 8)
+#define set_bit(byte) (mask[(uint8_t) byte / 8] |= 1 << (uint8_t) byte % 8)
 }
 
 static inline xs *xs_free(xs *x)
@@ -171,4 +174,39 @@ xs *xs_cpy(xs *dest, xs *src){
         dest->ref_cnt = 1;  
     }
     return dest;
+}
+
+char *xs_tok(xs *src, const char *delim){
+    static char *laststr = NULL;
+    char *cur, *ret;
+
+    if(!src)
+        cur = laststr;
+    else 
+        cur = xs_data(src);
+    
+    if (!delim[0] || !cur)
+        return cur;
+    
+    uint8_t mask[32] = {0};
+
+#define check_bit(byte) (mask[(uint8_t) byte / 8] & 1 << (uint8_t) byte % 8)
+#define set_bit(byte) (mask[(uint8_t) byte / 8] |= 1 << (uint8_t) byte % 8)
+    
+    size_t i, curlen = strlen(cur), delimlen = strlen(delim);
+    
+    for (i = 0; i < delimlen; i++)
+        set_bit(delim[i]);
+    for (i = 0; i < curlen; i++)
+        if (!check_bit(cur[i]))
+            break;
+    cur = cur + i;
+    for (i = 1; i < curlen; i++)
+        if (check_bit(cur[i]))
+            break;
+    *(cur + i) = '\0';
+    laststr = cur + i + 1;
+    if(!*laststr)
+        laststr = NULL;
+    return  cur;
 }
