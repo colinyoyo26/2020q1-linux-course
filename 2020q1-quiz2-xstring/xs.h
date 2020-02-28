@@ -39,6 +39,7 @@ xs *xs_new(xs *x, const void *p);
 xs *xs_cpy(xs *dest, xs *src);
 xs *xs_concat(xs *string, const xs *prefix, const xs *suffix);
 xs *xs_trim(xs *x, const char *trimset);
+char *xs_tok(xs *src, const char *delim);
 
 #define xs_literal_empty() \
     (xs) { .space_left = 15 }
