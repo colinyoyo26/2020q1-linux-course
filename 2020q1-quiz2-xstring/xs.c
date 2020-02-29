@@ -185,6 +185,7 @@ char *xs_tok(xs *src, const char *delim) {
     if (!src)
         cur = laststr;
     else {
+        xs_cow(src);
         cur = xs_data(src);
         src_flag = 1;
     }
