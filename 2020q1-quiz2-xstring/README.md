@@ -13,72 +13,72 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 Expected result
 
 ```
+init
+
+#string
+string: gggfoobarbarbarbarbarzzz
+&string: 0x7f652945f020
+reference count: 1
+
+#cow1
+string: 
+&string: 0x602080
+reference count: 1
+
+#cow2
+string: 
+&string: 0x6020c0
+reference count: 1
+
 after cpy from string to cow1 & cow2
 
 #string
 string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
+&string: 0x7f652945f020
 reference count: 3
 
 #cow1
 string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
-reference count: 1
+&string: 0x7f652945f020
+reference count: 3
 
 #cow2
 string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
-reference count: 1
+&string: 0x7f652945f020
+reference count: 3
 
-after concat cow1
+after concat string
 
 #string
-string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
-reference count: 2
-
-#cow1
 string: (((gggfoobarbarbarbarbarzzz)))
-&string: 0x1735450
-reference count: 1
-
-#cow2
-string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
-reference count: 1
-
-after cpy from cow1 to cow2
-
-#string
-string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
+&string: 0x7f652925e020
 reference count: 1
 
 #cow1
-string: (((gggfoobarbarbarbarbarzzz)))
-&string: 0x1735450
+string: gggfoobarbarbarbarbarzzz
+&string: 0x7f652945f020
 reference count: 2
 
 #cow2
-string: (((gggfoobarbarbarbarbarzzz)))
-&string: 0x1735450
-reference count: 1
+string: gggfoobarbarbarbarbarzzz
+&string: 0x7f652945f020
+reference count: 2
 
 after trim cow1
 
 #string
-string: gggfoobarbarbarbarbarzzz
-&string: 0x1735010
+string: (((gggfoobarbarbarbarbarzzz)))
+&string: 0x7f652925e020
 reference count: 1
 
 #cow1
 string: foobarbarbarbarbar
-&string: 0x1735480
+&string: 0x7f652905d020
 reference count: 1
 
 #cow2
-string: (((gggfoobarbarbarbarbarzzz)))
-&string: 0x1735450
+string: gggfoobarbarbarbarbarzzz
+&string: 0x7f652945f020
 reference count: 1
 ```
 
