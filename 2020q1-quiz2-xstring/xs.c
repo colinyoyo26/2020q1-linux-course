@@ -34,9 +34,6 @@ uint8_t xs_refcnt(const xs *x) {
     return xs_is_ptr(x) ? *(uint8_t *)(x->ptr - OFFSET) : 1;
 }
 static inline bool xs_is_ref(const xs *x) { return xs_refcnt(x) > 1; }
-static inline char *xs_refto(const xs *x) {
-    return *(char **)(x->ptr - OFFSET);
-}
 char *xs_data(const xs *x) { return xs_is_ptr(x) ? x->ptr : (char *)x->data; }
 
 static inline int ilog2(uint32_t n) { return 32 - __builtin_clz(n) - 1; }
