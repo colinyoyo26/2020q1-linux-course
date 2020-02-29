@@ -7,12 +7,8 @@ union x_string {
      * much like fbstring:
      * https://github.com/facebook/folly/blob/master/folly/docs/FBString.md
      */
-    struct 
-    {
-        char data[16];
-        xs *ref_to;
-    };
-    
+
+    char data[16];
 
     struct {
         uint8_t filler[15],
@@ -21,7 +17,7 @@ union x_string {
              */
             space_left : 4,
             /* if it is on heap, set to 1 */
-            is_ptr : 1, ref_cnt : 3;
+            is_ptr : 1, flag1, flag2, flag3;
     };
 
     /* heap allocated */
@@ -56,3 +52,4 @@ char *xs_tok(xs *src, const char *delim);
      xs_new(&xs_literal_empty(), "" x))
 
 char *xs_data(const xs *x);
+uint8_t xs_refcnt(const xs *x);
