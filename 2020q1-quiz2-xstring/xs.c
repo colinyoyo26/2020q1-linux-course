@@ -178,12 +178,15 @@ xs *xs_cpy(xs *dest, xs *src){
 
 char *xs_tok(xs *src, const char *delim){
     static char *laststr = NULL;
-    char *cur, *ret;
+    char *cur;
+    bool src_flag = 0;
 
     if(!src)
         cur = laststr;
-    else 
+    else {
         cur = xs_data(src);
+        src_flag = 1;
+    }
     
     if (!delim[0] || !cur)
         return cur;
@@ -206,6 +209,14 @@ char *xs_tok(xs *src, const char *delim){
             break;
     *(cur + i) = '\0';
     laststr = cur + i + 1;
+    
+    if(src_flag){
+        if(xs_is_ptr(src))
+            src->size = i;
+        else
+            src->space_left = 15 - i;
+        
+    }
     if(!*laststr)
         laststr = NULL;
     return  cur;
