@@ -204,7 +204,7 @@ char *xs_tok(xs *src, const char *delim){
         if (!check_bit(cur[i]))
             break;
     cur = cur + i;
-    for (i = 1; i < curlen; i++)
+    for (i = 0; i++ < curlen;)
         if (check_bit(cur[i]))
             break;
     *(cur + i) = '\0';
