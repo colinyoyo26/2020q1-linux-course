@@ -167,8 +167,11 @@ xs *xs_cpy(xs *dest, xs *src) {
     if (xs_is_ref(dest))
         xs_decr_ref(dest);
     /* too many references or short string */
-    if (!~xs_refcnt(src) || !xs_is_ptr(src))
-        xs_new(dest, xs_data(src));
+    if (!~xs_refcnt(src) || !xs_is_ptr(src)) {
+        size_t len = xs_size(src);
+        xs_grow(dest, len);
+        memcpy(xs_data(dest), xs_data(src), len);
+    }
     else
         xs_set_ref(dest, src);
     return dest;
