@@ -48,7 +48,6 @@ xs *xs_new(xs *x, const void *p) {
         x->ptr = malloc(((size_t)1 << x->capacity) + OFFSET) + OFFSET;
         memcpy(x->ptr, p, len);
         *(uint8_t *)(x->ptr - OFFSET) = 1;
-        xs_set_ref(x, x);
     } else {
         memcpy(x->data, p, len);
         x->space_left = 15 - (len - 1);
