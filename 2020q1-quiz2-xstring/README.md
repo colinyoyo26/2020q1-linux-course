@@ -3,6 +3,7 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 
 ## Compile
 `$ gcc -o test_cow -std=gnu11 test_output_cow.c xs.c`
+
 `$ gcc -o test_tok -std=gnu11 test_output_tok.c xs.c`
 
 ## Result
