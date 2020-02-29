@@ -1,5 +1,4 @@
 #include "xs.h"
-#include <stdio.h>
 
 xs string, cow1, cow2;
 void print_info(char *str) {

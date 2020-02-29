@@ -1,5 +1,4 @@
 #include "xs.h"
-#include <stdio.h>
 
 int main(void) {
     xs string;
