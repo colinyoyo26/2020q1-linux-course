@@ -82,8 +82,7 @@ static inline xs *xs_newempty(xs *x) {
 
 static inline xs *xs_free(xs *x) {
     if (xs_is_ptr(x) && !xs_is_ref(x))
-        ;
-    free(xs_data(x) - OFFSET);
+        free(xs_data(x) - OFFSET);
     return xs_newempty(x);
 }
 
