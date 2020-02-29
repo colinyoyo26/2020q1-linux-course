@@ -71,6 +71,7 @@ xs *xs_grow(xs *x, size_t len) {
     }
     x->is_ptr = true;
     x->capacity = len;
+    *(uint8_t *) (x->ptr - OFFSET) = 1;
     return x;
 }
 
