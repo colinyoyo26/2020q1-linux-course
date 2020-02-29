@@ -5,20 +5,45 @@
 #include "xs.h"
 
 static inline bool xs_is_ptr(const xs *x) { return x->is_ptr; }
-static inline bool xs_is_ref(const xs *x) { 
-    return x->ref_to ? x->ref_to->ref_cnt > 1 : false; 
-}
+
 static inline size_t xs_size(const xs *x)
 {
     return xs_is_ptr(x) ? x->size : 15 - x->space_left;
 }
-char *xs_data(const xs *x)
-{
-    return xs_is_ptr(x) ? (char *) x->ptr : (char *) x->data;
-}
 static inline size_t xs_capacity(const xs *x)
 {
     return xs_is_ptr(x) ? ((size_t) 1 << x->capacity) - 1 : 15;
+}
+static inline void xs_incr_ref(xs *x){
+    *(uint8_t *) (x->ptr - sizeof(uint8_t)) += 1;
+}
+static inline void xs_decr_ref(xs *x){
+    *(uint8_t *) (x->ptr - sizeof(uint8_t)) -= 1;
+}
+
+#define OFFSET 2 * sizeof(char *) 
+
+static inline void xs_set_ref(xs *x, xs *ref_to){
+    if(!xs_is_ptr(ref_to))
+        return;
+    /* copy the meta data */
+    *x = *ref_to;
+    *(char **) (x->ptr - OFFSET) = (char *) ref_to->ptr;
+    if(x != ref_to)
+        xs_incr_ref(ref_to);
+}
+uint8_t xs_refcnt(const xs *x){
+    return xs_is_ptr(x)? *(uint8_t *) (x->ptr - sizeof(uint8_t)) : 1;
+}
+static inline bool xs_is_ref(const xs *x) { 
+    return xs_refcnt(x) > 1; 
+}
+static inline char *xs_refto(const xs *x){
+    return *(char **) (x->ptr - OFFSET);
+}
+char *xs_data(const xs *x)
+{
+    return xs_is_ptr(x) ? (char *) xs_refto(x) : (char *) x->data;
 }
 
 static inline int ilog2(uint32_t n) { return 32 - __builtin_clz(n) - 1; }
@@ -31,14 +56,14 @@ xs *xs_new(xs *x, const void *p)
         x->capacity = ilog2(len) + 1;
         x->size = len - 1;
         x->is_ptr = true;
-        x->ptr = malloc((size_t) 1 << x->capacity);
+        x->ptr = malloc((size_t) 1 << x->capacity + OFFSET) + OFFSET;
         memcpy(x->ptr, p, len);
+        *(uint8_t *) (x->ptr - sizeof(uint8_t)) = 1;
+        xs_set_ref(x, x);
     } else {
         memcpy(x->data, p, len);
         x->space_left = 15 - (len - 1);
     }
-    x->ref_to = x;
-    x->ref_cnt = 1;
     return x;
 }
 
@@ -50,7 +75,7 @@ xs *xs_grow(xs *x, size_t len)
         return x;
     len = ilog2(len) + 1;
     if (xs_is_ptr(x))
-        x->ptr = realloc(x->ptr, (size_t) 1 << len);
+        x->ptr = realloc(x->ptr - OFFSET, (size_t) 1 << len + OFFSET) + OFFSET;
     else {
         char buf[16];
         memcpy(buf, x->data, 16);
@@ -73,9 +98,9 @@ static inline xs *xs_newempty(xs *x)
 
 static inline xs *xs_free(xs *x)
 {
-    x->ref_to->ref_cnt--;
+    xs_decr_ref(x);
     if (xs_is_ptr(x) && !xs_is_ref(x));
-        free(xs_data(x));
+        free(xs_data(x) - OFFSET);
     return xs_newempty(x);
 }
 
@@ -156,23 +181,19 @@ xs *xs_trim(xs *x, const char *trimset)
 static void xs_cow(xs *x){
     if(!xs_is_ref(x))
         return;
-    x->ref_to->ref_cnt--;
-    xs_new(x, xs_data(x->ref_to));
+    xs_decr_ref(x);
+    xs_new(x, xs_data(x));
     return;
 }
 
 xs *xs_cpy(xs *dest, xs *src){
-    /* too many references or short string */
     if(xs_is_ref(dest))
-        dest->ref_to->ref_cnt--;
-    if(!~src->ref_cnt || !xs_is_ptr(src))
+        xs_decr_ref(dest);
+    /* too many references or short string */
+    if(!~xs_refcnt(src) || !xs_is_ptr(src))
         xs_new(dest, xs_data(src));
-    else {
-        *dest = *src;
-        dest->ref_to = src;
-        src->ref_cnt++;
-        dest->ref_cnt = 1;  
-    }
+    else 
+        xs_set_ref(dest, src);
     return dest;
 }
 
