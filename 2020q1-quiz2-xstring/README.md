@@ -2,13 +2,15 @@
 Use SSO (small string optimization) and CoW (copy on write) to optimize string, click the link for detail.
 
 ## Compile
-`$ gcc -o test_cow -std=gnu11 test_output_cow.c xs.c`
+`$ make test_cpy`
 
-`$ gcc -o test_tok -std=gnu11 test_output_tok.c xs.c`
+`$ make test_tok`
+
+Append `-DCOW` flag to use COW, e.g. `$ make test_tok -DCOW`
 
 ## Result
 
-`$ ./test_cow`
+`$ make test_cpy`
 
 Expected result
 
@@ -82,7 +84,7 @@ string: gggfoobarbarbarbarbarzzz
 reference count: 1
 ```
 
-`$ ./test_tok`
+`$ make test_tok`
 
 Expected result
 
