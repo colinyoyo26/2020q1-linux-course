@@ -4,6 +4,24 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef COW
+#define IS_COW 1
+#define OFFSET sizeof(uint8_t)
+#define XS_INCR_REF(x) xs_incr_ref(x)
+#define XS_DECR_REF(x) xs_decr_ref(x)
+#define XS_COW(x) xs_cow(x)
+#define XS_IS_REF(x) xs_is_ref(x)
+#define XS_INIT_REFCNT(x) *(uint8_t *)(x->ptr - OFFSET) = 1
+#else
+#define IS_COW 0
+#define OFFSET 0
+#define XS_INCR_REF(x)
+#define XS_DECR_REF(x)
+#define XS_COW(x)
+#define XS_IS_REF(x) 0
+#define XS_INIT_REFCNT(x)
+#endif
+
 static inline bool xs_is_ptr(const xs *x) { return x->is_ptr; }
 
 static inline size_t xs_size(const xs *x) {
@@ -12,8 +30,6 @@ static inline size_t xs_size(const xs *x) {
 static inline size_t xs_capacity(const xs *x) {
     return xs_is_ptr(x) ? ((size_t)1 << x->capacity) - 1 : 15;
 }
-
-#define OFFSET sizeof(uint8_t)
 
 static inline void xs_incr_ref(xs *x) { *(uint8_t *)(x->ptr - OFFSET) += 1; }
 static inline xs *xs_free(xs *x);
@@ -26,12 +42,12 @@ static inline void xs_set_ref(xs *x, xs *ref_to) {
     if (!xs_is_ptr(ref_to) || x->ptr == ref_to->ptr)
         return;
 
-    xs_incr_ref(ref_to);
+    XS_INCR_REF(ref_to);
     /* copy the meta data */
     *x = *ref_to;
 }
 uint8_t xs_refcnt(const xs *x) {
-    return xs_is_ptr(x) ? *(uint8_t *)(x->ptr - OFFSET) : 1;
+    return IS_COW && xs_is_ptr(x) ? *(uint8_t *)(x->ptr - OFFSET) : 1;
 }
 static inline bool xs_is_ref(const xs *x) { return xs_refcnt(x) > 1; }
 char *xs_data(const xs *x) { return xs_is_ptr(x) ? x->ptr : (char *)x->data; }
@@ -47,7 +63,7 @@ xs *xs_new(xs *x, const void *p) {
         x->is_ptr = true;
         x->ptr = malloc(((size_t)1 << x->capacity) + OFFSET) + OFFSET;
         memcpy(x->ptr, p, len);
-        *(uint8_t *)(x->ptr - OFFSET) = 1;
+        XS_INIT_REFCNT(x);
     } else {
         memcpy(x->data, p, len);
         x->space_left = 15 - (len - 1);
@@ -61,7 +77,7 @@ xs *xs_grow(xs *x, size_t len) {
         return x;
     len = ilog2(len) + 1;
     if (xs_is_ptr(x))
-        x->ptr = realloc(x->ptr - OFFSET, (size_t)1 << len + OFFSET) + OFFSET;
+        x->ptr = realloc(x->ptr - OFFSET, ((size_t)1 << len) + OFFSET) + OFFSET;
     else {
         char buf[16];
         memcpy(buf, x->data, 16);
@@ -70,7 +86,7 @@ xs *xs_grow(xs *x, size_t len) {
     }
     x->is_ptr = true;
     x->capacity = len;
-    *(uint8_t *) (x->ptr - OFFSET) = 1;
+    XS_INIT_REFCNT(x);
     return x;
 }
 
@@ -81,14 +97,14 @@ static inline xs *xs_newempty(xs *x) {
 }
 
 static inline xs *xs_free(xs *x) {
-    if (xs_is_ptr(x) && !xs_is_ref(x))
+    if (xs_is_ptr(x) && !XS_IS_REF(x))
         free(xs_data(x) - OFFSET);
     return xs_newempty(x);
 }
 
 static void xs_cow(xs *x);
 xs *xs_concat(xs *string, const xs *prefix, const xs *suffix) {
-    xs_cow(string);
+    XS_COW(string);
     size_t pres = xs_size(prefix), sufs = xs_size(suffix), size = xs_size(string),
                  capacity = xs_capacity(string);
 
@@ -115,7 +131,7 @@ xs *xs_concat(xs *string, const xs *prefix, const xs *suffix) {
 xs *xs_trim(xs *x, const char *trimset) {
     if (!trimset[0])
         return x;
-    xs_cow(x);
+    XS_COW(x);
     char *dataptr = xs_data(x), *orig = dataptr;
 
     /* similar to strspn/strpbrk but it operates on binary data */
@@ -156,23 +172,28 @@ xs *xs_trim(xs *x, const char *trimset) {
 }
 
 static void xs_cow(xs *x) {
-    if (!xs_is_ref(x))
+    if (!XS_IS_REF(x))
         return;
-    xs_decr_ref(x);
+    XS_DECR_REF(x);
     xs_new(x, xs_data(x));
     return;
 }
 
 xs *xs_cpy(xs *dest, xs *src) {
-    if (xs_is_ref(dest))
-        xs_decr_ref(dest);
-    /* too many references or short string */
-    if (!~xs_refcnt(src) || !xs_is_ptr(src)) {
+    if (XS_IS_REF(dest))
+        XS_DECR_REF(dest);
+    /* too many references or short string
+     * !OFFET for non-COW
+     */
+    if (!OFFSET || !~xs_refcnt(src) || !xs_is_ptr(src)) {
         size_t len = xs_size(src);
         xs_grow(dest, len);
         memcpy(xs_data(dest), xs_data(src), len);
-    }
-    else
+        if(xs_is_ptr(dest)) 
+            dest->size = len;
+        else
+            dest->space_left = 15 - len;
+    } else
         xs_set_ref(dest, src);
     return dest;
 }
@@ -185,7 +206,7 @@ char *xs_tok(xs *src, const char *delim) {
     if (!src)
         cur = laststr;
     else {
-        xs_cow(src);
+        XS_COW(src);
         cur = xs_data(src);
         src_flag = 1;
     }
