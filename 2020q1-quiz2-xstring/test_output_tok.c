@@ -1,6 +1,7 @@
 #include "xs.h"
 
-int main(void) {
+int main(void)
+{
     xs string;
     char token[8] = "HELLO W", *tem;
     xs_new(&string, "HELLOW fooHELLOWbarHbarfooLbarLbarObarW");

@@ -1,7 +1,8 @@
 #include "xs.h"
 
 xs string, cow1, cow2;
-void print_info(char *str) {
+void print_info(char *str)
+{
     printf("\n%s\n", str);
 
     printf("\n#string");
@@ -20,7 +21,8 @@ void print_info(char *str) {
     printf("\nreference count: %d\n", xs_refcnt(&cow2));
 }
 
-int main() {
+int main()
+{
     xs_new(&string, "gggfoobarbarbarbarbarzzz");
     print_info("init");
     xs_cpy(&cow1, &string);
