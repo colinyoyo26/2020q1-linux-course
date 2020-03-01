@@ -1,13 +1,19 @@
-CFLAGS = -g -O2 
+CC = gcc
+CFLAGS = -std=gnu11
 
-all: bench
+ifeq ("$(COW)","1")
+	CFLAGS += -DCOW
+endif
 
-bench: benchmark.c rawmemchr.c orig.c
-	$(CC) $(CFLAGS) -o $@ $^ 
+test_cpy: xs.c test_output_cpy.c
+	$(CC) $(CFLAGS) -o $@ $^
+	./$@
+	@rm $@
 
-plot: bench
-	bash script/plot.sh
-
+test_tok: xs.c test_output_tok.c
+	$(CC) $(CFLAGS) -o $@ $^
+	./$@
+	@rm $@
 
 clean:
-$(RM) bench *.png
+	$(RM) test_cpy test_tok
