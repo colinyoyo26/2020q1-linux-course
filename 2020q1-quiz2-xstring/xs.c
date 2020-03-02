@@ -22,6 +22,8 @@
 #define XS_INIT_REFCNT(x)
 #endif
 
+#define LEN_TO_COW 16
+
 static inline bool xs_is_ptr(const xs *x)
 {
     return x->is_ptr;
@@ -215,7 +217,8 @@ xs *xs_cpy(xs *dest, xs *src)
     /* too many references or short string
      * !OFFET for non-COW
      */
-    if (!OFFSET || !~xs_refcnt(src) || !xs_is_ptr(src)) {
+    if (!OFFSET || xs_size(src) < LEN_TO_COW || !~xs_refcnt(src) ||
+        !xs_is_ptr(src)) {
         size_t len = xs_size(src);
         xs_grow(dest, len);
         memcpy(xs_data(dest), xs_data(src), len);
