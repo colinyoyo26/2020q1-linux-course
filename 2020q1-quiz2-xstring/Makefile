@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=gnu11
+CFLAGS = -g -std=gnu11
 
 ifeq ("$(COW)","1")
 	CFLAGS += -DCOW
@@ -8,12 +8,17 @@ endif
 test_cpy: xs.c test_output_cpy.c
 	$(CC) $(CFLAGS) -o $@ $^
 	./$@
-	@rm $@
+	@$(RM) $@
 
 test_tok: xs.c test_output_tok.c
 	$(CC) $(CFLAGS) -o $@ $^
 	./$@
-	@rm $@
+	@$(RM) $@
+
+bench: xs.c cpy_bench.c
+	$(CC) $(CFLAGS) -o $@ $^
+	./$@ "foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr" 100000
+	@$(RM) $@
 
 clean:
-	$(RM) test_cpy test_tok
+	$(RM) test_cpy test_tok bench
