@@ -16,8 +16,8 @@ test_tok: xs.c test_output_tok.c
 	@$(RM) $@
 
 bench: xs.c cpy_bench.c
-	$(CC) $(CFLAGS) -o $@ $^
-	./$@ "foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr" 100000
+	@$(CC) $(CFLAGS) -o $@ $^
+	@./$@ "foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr" 100000 $(MODE)
 	@$(RM) $@
 
 clean:
