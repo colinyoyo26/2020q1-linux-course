@@ -103,15 +103,52 @@ bar
 bar
 ```
 
+`$ make bench`
+
+```
+MODE: XSTR
+refcnt: 1
+time: 23440.000000
+
+ Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 0':
+
+           758,747      cache-misses              #   85.012 % of all cache refs    
+           892,518      cache-references                                            
+
+       0.032626588 seconds time elapsed
+
+```
+
 `$ make bench COW=1`
 
 ```
+MODE: XSTR
 refcnt: 100001
-x_time: 4229.250000 
-c_time: 3839.500000
+time: 5019.750000
+
+ Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 0':
+
+           111,351      cache-misses              #   57.129 % of all cache refs    
+           194,910      cache-references                                            
+
+       0.008941326 seconds time elapsed
+
 ```
 
-`$ make bench`
+`make bench MODE=1`
+
+```
+MODE: CSTR
+time: 4244.250000
+
+ Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 1':
+
+           980,451      cache-misses              #   66.203 % of all cache refs    
+         1,480,977      cache-references                                            
+
+       0.019159115 seconds time elapsed
+
+```
 
 ```
 refcnt: 1
