@@ -102,3 +102,19 @@ bar
 bar
 bar
 ```
+
+`$ make bench COW=1`
+
+```
+refcnt: 100001
+x_time: 4229.250000 
+c_time: 3839.500000
+```
+
+`$ make bench`
+
+```
+refcnt: 1
+x_time: 20226.250000 
+c_time: 3773.250000
+```
