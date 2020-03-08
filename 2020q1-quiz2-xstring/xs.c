@@ -51,7 +51,7 @@ static inline void xs_decr_ref(xs *x)
 
 static inline void xs_set_ref(xs *x, xs *ref_to)
 {
-    if (!xs_is_ptr(ref_to) || x->ptr == ref_to->ptr)
+    if (xs_size(ref_to) < LEN_TO_COW || x->ptr == ref_to->ptr)
         return;
 
     XS_INCR_REF(ref_to);
