@@ -108,7 +108,7 @@ bar
 ```
 MODE: XSTR
 refcnt: 1
-time: 23440.000000
+time: 23440.000000 (ms)
 
  Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 0':
 
@@ -124,7 +124,7 @@ time: 23440.000000
 ```
 MODE: XSTR
 refcnt: 100001
-time: 5019.750000
+time: 5019.750000 (ms)
 
  Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 0':
 
@@ -139,7 +139,7 @@ time: 5019.750000
 
 ```
 MODE: CSTR
-time: 4244.250000
+time: 4244.250000 (ms)
 
  Performance counter stats for './bench foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr 100000 1':
 
@@ -148,10 +148,4 @@ time: 4244.250000
 
        0.019159115 seconds time elapsed
 
-```
-
-```
-refcnt: 1
-x_time: 20226.250000 
-c_time: 3773.250000
 ```
