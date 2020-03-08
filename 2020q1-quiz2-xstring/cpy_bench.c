@@ -64,6 +64,6 @@ int main(int argc, char **argv)
     }
 
     printf("refcnt: %ld\n", xs_refcnt(&x_in));
-    printf("%lf %lf\n", x_time, c_time);
+    printf("x_time: %lf \nc_time: %lf\n", x_time, c_time);
     return 0;
 }
