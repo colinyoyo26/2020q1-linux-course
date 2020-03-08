@@ -3,10 +3,11 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #define CPYS cpys
 int cpys;
+
+typedef enum {XSTR, CSTR} MODE;
 
 static inline double micro_time()
 {
@@ -39,31 +40,33 @@ double test_c_str(char **c_str, char *c_in)
 
 int main(int argc, char **argv)
 {
-    if (argc != 3)
+    if (argc != 4)
         return 1;
+    MODE mode = atoi(argv[3]);
     cpys = atoi(argv[2]);
     int len = strlen(argv[1]);
-    xs x_in;
-    char *c_in = argv[1];
-    xs_new(&x_in, argv[1]);
-    assert(!strcmp(xs_data(&x_in), c_in));
+    double time = 0;
 
-    xs x_str[CPYS];
-    char *c_str[CPYS];
-
-    for (int i = 0; i < CPYS; i++) {
-        xs_new(&x_str[i], "");
-        c_str[i] = malloc((len + 1) * sizeof(char));
+    if(mode == XSTR){
+        xs x_in;
+        xs_new(&x_in, argv[1]);
+        xs x_str[CPYS];
+        for (int i = 0; i < CPYS; i++)
+            xs_new(&x_str[i], "");
+        time = test_x_str(x_str, x_in);
+        printf("MODE: XSTR\n");
+        printf("refcnt: %ld\n", xs_refcnt(&x_in));
+    }
+    else{
+        char *c_in = argv[1];
+        char *c_str[CPYS];
+        for (int i = 0; i < CPYS; i++)
+            c_str[i] = malloc((len + 1) * sizeof(char));
+        time = test_c_str(c_str, c_in);
+        printf("MODE: CSTR\n");
     }
 
-    double x_time = test_x_str(x_str, x_in), c_time = test_c_str(c_str, c_in);
-
-    for (int i = 0; i < CPYS; i++){
-        assert(!strcmp(xs_data(&x_str[i]), c_in));
-        assert(!strcmp(c_str[i], c_in));
-    }
-
-    printf("refcnt: %ld\n", xs_refcnt(&x_in));
-    printf("x_time: %lf \nc_time: %lf\n", x_time, c_time);
+    
+    printf("time: %lf\n", time);
     return 0;
 }
