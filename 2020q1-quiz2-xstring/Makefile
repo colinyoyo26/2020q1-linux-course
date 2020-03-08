@@ -1,5 +1,7 @@
 CC = gcc
 CFLAGS = -g -std=gnu11
+TEXT = "foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr"
+MODE ?= 0
 
 ifeq ("$(COW)","1")
 	CFLAGS += -DCOW
@@ -17,7 +19,7 @@ test_tok: xs.c test_output_tok.c
 
 bench: xs.c cpy_bench.c
 	@$(CC) $(CFLAGS) -o $@ $^
-	@./$@ "foo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrrfoo bar bar barbarbarbar foooooobarrrrrrarrrrrr" 100000 $(MODE)
+	@sudo perf stat --repeat 1 -e cache-misses,cache-references ./$@ $(TEXT) 100000 $(MODE)
 	@$(RM) $@
 
 clean:
