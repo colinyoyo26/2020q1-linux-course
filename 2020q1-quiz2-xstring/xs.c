@@ -6,12 +6,12 @@
 
 #ifdef COW
 #define IS_COW 1
-#define OFFSET sizeof(uint8_t)
+#define OFFSET sizeof(REFTYPE)
 #define XS_INCR_REF(x) xs_incr_ref(x)
 #define XS_DECR_REF(x) xs_decr_ref(x)
 #define XS_COW(x) xs_cow(x)
 #define XS_IS_REF(x) xs_is_ref(x)
-#define XS_INIT_REFCNT(x) *(uint8_t *) (x->ptr - OFFSET) = 1
+#define XS_INIT_REFCNT(x) *(REFTYPE *) (x->ptr - OFFSET) = 1
 #else
 #define IS_COW 0
 #define OFFSET 0
@@ -40,12 +40,12 @@ static inline size_t xs_capacity(const xs *x)
 
 static inline void xs_incr_ref(xs *x)
 {
-    *(uint8_t *) (x->ptr - OFFSET) += 1;
+    *(REFTYPE *) (x->ptr - OFFSET) += 1;
 }
 static inline xs *xs_free(xs *x);
 static inline void xs_decr_ref(xs *x)
 {
-    if (!--(*(uint8_t *) (x->ptr - OFFSET)))
+    if (!--(*(REFTYPE *) (x->ptr - OFFSET)))
         xs_free(x);
 }
 
@@ -58,9 +58,9 @@ static inline void xs_set_ref(xs *x, xs *ref_to)
     /* copy the meta data */
     *x = *ref_to;
 }
-uint8_t xs_refcnt(const xs *x)
+REFTYPE xs_refcnt(const xs *x)
 {
-    return IS_COW && xs_is_ptr(x) ? *(uint8_t *) (x->ptr - OFFSET) : 1;
+    return IS_COW && xs_is_ptr(x) ? *(REFTYPE *) (x->ptr - OFFSET) : 1;
 }
 static inline bool xs_is_ref(const xs *x)
 {

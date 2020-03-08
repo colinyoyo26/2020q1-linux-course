@@ -51,5 +51,6 @@ char *xs_tok(xs *src, const char *delim);
      }){1}),                                               \
      xs_new(&xs_literal_empty(), "" x))
 
+#define REFTYPE size_t
 char *xs_data(const xs *x);
-uint8_t xs_refcnt(const xs *x);
+REFTYPE xs_refcnt(const xs *x);
