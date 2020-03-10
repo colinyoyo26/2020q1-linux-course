@@ -135,7 +135,7 @@ time: 5019.750000 (ms)
 
 ```
 
-`make bench MODE=1`
+`$ make bench MODE=1`
 
 ```
 MODE: CSTR
