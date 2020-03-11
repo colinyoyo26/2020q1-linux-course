@@ -22,5 +22,16 @@ bench: xs.c cpy_bench.c
 	@sudo perf stat --repeat 1 -e cache-misses,cache-references ./$@ $(TEXT) 100000 $(MODE)
 	@$(RM) $@
 
+plot: xs.c cpy_bench.c
+	@$(CC) $(CFLAGS) -o $@ $^
+	@bash ./script/driver.sh xstr.txt 0
+	@bash ./script/driver.sh strcpy.txt 1
+	@$(RM) $@ 
+	@$(CC) $(CFLAGS) -DCOW -o $@ $^
+	@bash ./script/driver.sh xstrcow.txt 0
+	@gnuplot script/plot.gp
+	@$(RM) $@ xstr.txt xstrcow.txt strcpy.txt
+
+
 clean:
-	$(RM) test_cpy test_tok bench
+	$(RM) test_cpy test_tok bench plot xstr.txt xstrcow.txt strcpy.txt *.gp
