@@ -8,6 +8,6 @@ MODE=$2
 COW=$3
 for i in `seq 1 5 $CHARS`
 do
-    echo "lens: $i "
+    printf "lens: $i "
     ./plot $(cat $TEXT) $i $MODE
-done | grep -E "time|lens" | awk '{print $2}' >> $DATA
+done | grep -E "time|lens" | awk '{print $2 " " $4}' >> $DATA
