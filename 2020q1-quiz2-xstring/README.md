@@ -17,6 +17,9 @@ Append `-DCOW` flag to use COW, e.g. `$ make test_tok -DCOW`
 `$ make bench MODE=1`
 - Test performance of `strcpy`
 
+`$ make plot`
+- Visualize the performance of three method
+
 ## Result
 
 `$ make test_cpy`
@@ -158,3 +161,7 @@ time: 4244.250000 (ms)
        0.019159115 seconds time elapsed
 
 ```
+
+`$ make plot`
+
+![](docs/result.png)
