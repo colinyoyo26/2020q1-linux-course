@@ -6,7 +6,7 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 
 `$ make test_tok`
 
-Append `-DCOW` flag to use COW, e.g. `$ make test_tok -DCOW`
+- Append `-DCOW` flag to use COW, e.g. `$ make test_tok -DCOW`
 
 `$ make bench`
 - Test performance of `xs_cpy` w/o CoW (running time and cache-misses)
