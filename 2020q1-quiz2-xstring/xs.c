@@ -276,4 +276,6 @@ char *xs_tok(xs *src, const char *delim)
     if (!*laststr)
         laststr = NULL;
     return cur;
+#undef check_bit
+#undef set_bit
 }
