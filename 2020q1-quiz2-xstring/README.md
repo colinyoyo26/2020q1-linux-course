@@ -6,6 +6,8 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 
 `$ make test_tok`
 
+`$ make test_tok_r`
+
 - Append `-DCOW` flag to use COW, e.g. `$ make test_tok -DCOW`
 
 `$ make bench`
@@ -23,8 +25,6 @@ Use SSO (small string optimization) and CoW (copy on write) to optimize string, 
 ## Result
 
 `$ make test_cpy`
-
-Expected result
 
 ```
 init
@@ -98,8 +98,6 @@ reference count: 1
 
 `$ make test_tok`
 
-Expected result
-
 ```
 #token
 HELLO W
@@ -113,6 +111,17 @@ barfoo
 bar
 bar
 bar
+```
+
+`$ make test_tok_r`
+
+```
+./test_tok_r
+#token: @#$(^&*
+#initial str1: my@name&is(yoyi
+#initial str2: foo@bar&bar(foooo
+out1: my name is yoyi
+out2: foo bar bar foooo
 ```
 
 `$ make bench`
