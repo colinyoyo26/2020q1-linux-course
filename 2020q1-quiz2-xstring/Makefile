@@ -17,6 +17,11 @@ test_tok: xs.c test_output_tok.c
 	./$@
 	@$(RM) $@
 
+test_tok_r: xs.c test_output_tok_r.c
+	$(CC) $(CFLAGS) -o $@ $^
+	./$@
+	@$(RM) $@
+
 bench: xs.c cpy_bench.c
 	@$(CC) $(CFLAGS) -o $@ $^
 	@sudo perf stat --repeat 1 -e cache-misses,cache-references ./$@ $(TEXT) 100000 $(MODE)

@@ -279,3 +279,51 @@ char *xs_tok(xs *src, const char *delim)
 #undef check_bit
 #undef set_bit
 }
+
+char *xs_tok_r(xs *src, const char *delim, char **saveptr)
+{
+    char *cur;
+    bool src_flag = 0;
+
+    if (!src)
+        cur = *saveptr;
+    else {
+        XS_COW(src);
+        cur = xs_data(src);
+        src_flag = 1;
+    }
+
+    if (!delim[0] || !cur)
+        return cur;
+
+    uint8_t mask[32] = {0};
+
+#define check_bit(byte) (mask[(uint8_t) byte / 8] & 1 << (uint8_t) byte % 8)
+#define set_bit(byte) (mask[(uint8_t) byte / 8] |= 1 << (uint8_t) byte % 8)
+
+    size_t i, curlen = strlen(cur), delimlen = strlen(delim);
+
+    for (i = 0; i < delimlen; i++)
+        set_bit(delim[i]);
+    for (i = 0; i < curlen; i++)
+        if (!check_bit(cur[i]))
+            break;
+    cur = cur + i;
+    for (i = 0; i++ < curlen;)
+        if (check_bit(cur[i]))
+            break;
+    *(cur + i) = '\0';
+    *saveptr = cur + i + 1;
+
+    if (src_flag) {
+        if (xs_is_ptr(src))
+            src->size = i;
+        else
+            src->space_left = 15 - i;
+    }
+    if (!*saveptr)
+        saveptr = NULL;
+    return cur;
+#undef check_bit
+#undef set_bit
+}
