@@ -116,12 +116,13 @@ bar
 `$ make test_tok_r`
 
 ```
-./test_tok_r
-#token: @#$(^&*
-#initial str1: my@name&is(yoyi
-#initial str2: foo@bar&bar(foooo
-out1: my name is yoyi
-out2: foo bar bar foooo
+#token: @#(^&$*
+#initial str of 0th thread: $$IM&*^0th@@@#thread!!!$$
+#initial str of 1th thread: $$IM&*^1th@@@#thread!!!$$
+#initial str of 2th thread: $$IM&*^2th@@@#thread!!!$$
+IM 0th thread!!!
+IM 2th thread!!!
+IM 1th thread!!!
 ```
 
 `$ make bench`
